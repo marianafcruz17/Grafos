@@ -1,123 +1,104 @@
-// Dijkstra's Algorithm in C
+#include <limits.h>
 #include <stdio.h>
-#define INFINITY 9999
-#define MAX 10
+#include <stdbool.h>
+ 
 
-void dijkstra(int Graph[MAX][MAX],int n,int start);
+int vertices;
 
-void dijkstra(int Graph[MAX][MAX],int n,int start){
-    int cost[MAX][MAX],distance[MAX],pred[MAX];
-    int visited[MAX],count,mindinstance,nextnode,i,j;
-
-    for(i=0;i<n;i++){
-        for(j=0;j<n;j++){
-            if(Graph[i[j]==0])
-                cost[i][j] = INFINITY;
-            else
-                cost[i][j] = Graph[i][j];
+int distanciamin(int dist[], bool sptSet[])
+{
+    int min = INT_MAX, indexmin;
+ 
+    for (int v = 0; v < vertices; v++)
+    {
+        if (sptSet[v] == false && dist[v] <= min)
+        {
+            min = dist[v], indexmin = v;
         }
     }
-
-    for(i=0;i<n;i++){
-        distance[i] = cost[start][i];
-        pred[i] = start;
-        visited[i] = 0;
-    }
-
-    distance[start] = 0;
-    visited[start] = 1;
-
-    while(count<n-1){
-        mindinstance = INFINITY;
-
-        for(i=0;i<n;i++){
-            mindinstance = distance[i];
-            nextnode = i;
-        }
-
-        visited[nextnode] = 1;
-
-        for(i=0;i<n;i++){
-            if(!visited[i]){
-                if(mindinstance + cost[nextnode][i]<distance[i]){
-                    distance[i] = mindinstance + cost[nextnode][i];
-                    pred[i] = nextnode;
-                }
-            }
-        }
-
-        count++;
-    }
-
-    for(i=0;i<n;i++){
-        if(i!=start){
-            printf("\n Distancia %d: %d",i,distance[i]);
-        }
+    return indexmin;
+}
+ 
+void printar(int dist[])
+{
+    printf("Vertice \t\t Distancia do vertice origem\n");
+    for (int i = 0; i < vertices; i++)
+    {
+        printf("%d \t\t %d\n", i+1, dist[i]);
     }
 }
+ 
+void dijkstra(int grafo[vertices][vertices], int src)
+{
+    int dist[vertices]; 
+ 
+    bool sptSet[vertices];
 
-int main() {
-  int Graph[MAX][MAX], i, j, n, u;
-  n = 7;
+    for (int i = 0; i < vertices; i++)
+    {
+            dist[i] = INT_MAX, sptSet[i] = false;
+    }
+ 
+    dist[src] = 0;
+ 
+    for (int aux = 0; aux < vertices - 1; aux++) 
+    {
 
-  Graph[0][0] = 0;
-  Graph[0][1] = 0;
-  Graph[0][2] = 1;
-  Graph[0][3] = 2;
-  Graph[0][4] = 0;
-  Graph[0][5] = 0;
-  Graph[0][6] = 0;
-
-  Graph[1][0] = 0;
-  Graph[1][1] = 0;
-  Graph[1][2] = 2;
-  Graph[1][3] = 0;
-  Graph[1][4] = 0;
-  Graph[1][5] = 3;
-  Graph[1][6] = 0;
-
-  Graph[2][0] = 1;
-  Graph[2][1] = 2;
-  Graph[2][2] = 0;
-  Graph[2][3] = 1;
-  Graph[2][4] = 3;
-  Graph[2][5] = 0;
-  Graph[2][6] = 0;
-
-  Graph[3][0] = 2;
-  Graph[3][1] = 0;
-  Graph[3][2] = 1;
-  Graph[3][3] = 0;
-  Graph[3][4] = 0;
-  Graph[3][5] = 0;
-  Graph[3][6] = 1;
-
-  Graph[4][0] = 0;
-  Graph[4][1] = 0;
-  Graph[4][2] = 3;
-  Graph[4][3] = 0;
-  Graph[4][4] = 0;
-  Graph[4][5] = 2;
-  Graph[4][6] = 0;
-
-  Graph[5][0] = 0;
-  Graph[5][1] = 3;
-  Graph[5][2] = 0;
-  Graph[5][3] = 0;
-  Graph[5][4] = 2;
-  Graph[5][5] = 0;
-  Graph[5][6] = 1;
-
-  Graph[6][0] = 0;
-  Graph[6][1] = 0;
-  Graph[6][2] = 0;
-  Graph[6][3] = 1;
-  Graph[6][4] = 0;
-  Graph[6][5] = 1;
-  Graph[6][6] = 0;
-
-  u = 0;
-  dijkstra(Graph, n, u);
-
-  return 0;
+        int u = distanciamin(dist, sptSet);
+ 
+        sptSet[u] = true;
+ 
+        for (int v = 0; v < vertices; v++)
+        {
+            if (!sptSet[v] && grafo[u][v] && dist[u] != INT_MAX && dist[u] + grafo[u][v] < dist[v])
+            {
+                dist[v] = dist[u] + grafo[u][v];
+            }
+        }
+    }
+ 
+    printar(dist);
+}
+ 
+int main()
+{
+    int linha, coluna, peso, arestas, i,j,ori;
+    char nome[30];
+    char aux;
+    printf("Digite o nome do arquivo de entrada:\n");
+    scanf("%s", nome);
+    getchar();
+    FILE *arquivo;
+    arquivo = fopen(nome, "r");
+    fscanf(arquivo, "%d", &vertices);
+    int grafo[vertices][vertices];
+    for(i =0; i<vertices; i++)
+    {
+      for(j=0; j<vertices ; j++)
+        {
+          grafo[i][j] = 0;
+        }
+    }
+    fscanf(arquivo, "%d", &arestas);
+    for(i=0;i<arestas;i++)
+    {
+        fscanf(arquivo, "%d", &linha);
+        fscanf(arquivo, "%d", &coluna);
+        fscanf(arquivo, "%c", &aux);
+        if (aux == ' ')
+        {
+            fscanf(arquivo, "%d", &peso);
+        }
+        else
+        {
+            peso = 1;
+        }
+        grafo[linha-1][coluna-1] = peso;
+        grafo[coluna-1][linha-1] = peso;
+    }
+    printf("Digite o vertice que sera a origem:\n");
+    scanf("%d", &ori);
+    dijkstra(grafo, ori-1);
+    
+    return 0;
 }
